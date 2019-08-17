@@ -1,8 +1,9 @@
 // https://bit.ly/2KQb0gR
 
 const express = require('express')
+const Request = require('request')
 const app = express()
-const port = 3000
+
 app.use(express.json())
 let pokemons = []
 
@@ -42,7 +43,7 @@ function isPokemonExisted(id) {
 mockPokemon()
 
 // Root path
-app.get('/', (req, res) => res.send('Hello World!!!!!!!'))
+app.get('/', (req, res) => res.send({ message: 'Hello world' }))
 
 // GET /pokemons -> list all pokemons http://localhost:3000/pokemons
 app.get('/pokemons', (req, res) => res.send(pokemons))
@@ -63,8 +64,18 @@ app.post('/pokemons', (req, res) => {
 
 // GET http://localhost:3000/pokemon/1
 app.get('/pokemon/:id', (req, res) => {
+    if (!isSufficientParam(req.params.id)) {
+        res.status(400).send({ error: 'Insufficient paramsters: id is required parameter' })
+        return
+    }
+
     let id = req.params.id
     let p = pokemons[id - 1]
+    if (p === undefined || p === null) {
+        res.status(400).send({ error: 'The pokemon could not be found' })
+        return
+    }
+
     res.send(p)
 })
 
@@ -82,7 +93,7 @@ app.put('/pokemon/:id', (req, res) => {
     }
 
     let id = req.params.id
-    if (isPokemonExisted(id)) {
+    if (!isPokemonExisted(id)) {
         res.status(400).send({ error: 'Cannot update pokemon: Pokemon is not found' })
         return
     }
@@ -109,4 +120,4 @@ app.delete('/pokemon/:id', (req, res) => {
     res.sendStatus(204)
 })
 
-app.listen(port, () => console.log(`Pokemon API listen on port ${port}`))
+module.exports = app
