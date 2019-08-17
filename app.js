@@ -34,6 +34,10 @@ function isSufficientParam(v) {
     return v !== undefined && v !== null && v !== ''
 }
 
+function isPokemonExisted(id) {
+    return pokemons[id-1] !== undefined && pokemons[id-1] !== null
+}
+
 // Generate mock pokemons
 mockPokemon()
 
@@ -78,15 +82,31 @@ app.put('/pokemon/:id', (req, res) => {
     }
 
     let id = req.params.id
-    let p = pokemons[id - 1]
-    if (p === undefined) {
+    if (isPokemonExisted(id)) {
         res.status(400).send({ error: 'Cannot update pokemon: Pokemon is not found' })
         return
     }
 
+    let p = pokemons[id - 1]
     p.type2 = req.body.type2
     pokemons[id - 1] = p
     res.sendStatus(200)
+})
+
+app.delete('/pokemon/:id', (req, res) => {
+    if (!isSufficientParam(req.params.id)) {
+        res.status(400).send({ error: 'Insufficient parameters: id is required parameter' })
+        return
+    }
+
+    let id = req.params.id
+    if (!isPokemonExisted(id)) {
+        res.status(400).send({ error: 'Cannot delete pokemon: Pokemon is not found' })
+        return
+    }
+
+    delete pokemons[id-1]
+    res.sendStatus(204)
 })
 
 app.listen(port, () => console.log(`Pokemon API listen on port ${port}`))
