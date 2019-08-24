@@ -6,17 +6,6 @@ const app = require('../app')
 chai.should()
 
 describe('Pokemon API', () => {
-    describe('GET /', () => {
-        it('should return 200 OK with "Hello world"', (done) => {
-            request(app).get('/')
-                .expect(200)
-                .end((err, res) => {
-                    res.body.should.deep.equal({ message: 'Hello world' })
-                    done()
-                })
-        })
-    })
-
     describe('GET /pokemon/:id', () => {
         it('should return 200 OK with a pokemon', (done) => {
             request(app).get('/pokemon/1')
